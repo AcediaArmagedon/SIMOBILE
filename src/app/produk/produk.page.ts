@@ -10,6 +10,7 @@ import { Product } from '../product';
 export class ProdukPage implements OnInit {
 
   products: any[] = [];
+  searchText: string = '';
 
   constructor(private productservice: Product) { }
 
@@ -17,4 +18,12 @@ export class ProdukPage implements OnInit {
     this.products = this.productservice.getProducts();
   }
 
+searchProduct() {
+    const allProducts = this.productservice.getProducts();
+
+    this.products = allProducts.filter(product =>
+      product.name.toLowerCase().includes(this.searchText.toLowerCase())
+    );
+  }
+  
 }

@@ -11,6 +11,16 @@
     </ion-toolbar>
   </ion-header>
 
+  <ion-item>
+    <ion-input
+      label="Cari Produk"
+      labelPlacement="stacked"
+      placeholder="Ketik nama produk..."
+      [(ngModel)]="searchText"
+      (ionInput)="searchProduct()">
+    </ion-input>
+  </ion-item>
+  
   <ion-list>
     <ion-item *ngFor="let product of products">
       <ion-label>
