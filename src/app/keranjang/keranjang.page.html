@@ -1,0 +1,129 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Keranjang Belanja</ion-title>
+    <ion-buttons slot="end" *ngIf="cartItems.length > 0">
+      <ion-button (click)="kosongkanKeranjang()" color="light">
+        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Empty Cart State -->
+  <div *ngIf="cartItems.length === 0" style="text-align: center; padding: 60px 20px;">
+    <ion-icon name="cart-outline" style="font-size: 72px; color: var(--ion-color-step-300, #ccc); margin-bottom: 16px;"></ion-icon>
+    <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Keranjang Belanja Kosong</h2>
+    <p style="font-size: 14px; opacity: 0.7; margin: 8px 0 24px 0;">Pilih produk dari katalog untuk memulai catatan transaksi kasir Bu Marni.</p>
+    <ion-button routerLink="/produk" fill="solid" color="primary" style="--border-radius: 12px;">
+      <ion-icon name="storefront-outline" slot="start"></ion-icon>
+      Buka Katalog Produk
+    </ion-button>
+  </div>
+
+  <div *ngIf="cartItems.length > 0">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+      <span style="font-size: 13px; opacity: 0.7;">Daftar belanja (Geser ke kiri untuk hapus)</span>
+      <ion-badge color="tertiary">{{ cartItems.length }} jenis barang</ion-badge>
+    </div>
+
+    <!-- Item List with ion-item-sliding (Swipe to Delete Animation) -->
+    <ion-list style="border-radius: 14px; overflow: hidden; background: transparent;">
+
+      <ion-item-sliding *ngFor="let item of cartItems" style="margin-bottom: 8px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+
+        <ion-item lines="none" style="--padding-start: 12px; --inner-padding-end: 12px;">
+
+          <ion-thumbnail slot="start" style="width: 48px; height: 48px; border-radius: 8px; overflow: hidden;">
+            <img [src]="item.produk.foto || defaultImage" [alt]="item.produk.nama" style="object-fit: cover;" />
+          </ion-thumbnail>
+
+          <ion-label>
+            <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 2px;">{{ item.produk.nama }}</h2>
+            <p style="font-size: 12px; opacity: 0.7;">
+              Rp {{ item.produk.hargaJual | number:'1.0-0' }} / unit
+            </p>
+            <div style="font-size: 13px; font-weight: 800; color: var(--ion-color-primary); margin-top: 2px;">
+              Subtotal: Rp {{ item.subtotal | number:'1.0-0' }}
+            </div>
+          </ion-label>
+
+          <!-- Qty Adjuster -->
+          <div slot="end" style="display: flex; align-items: center; gap: 6px;">
+            <ion-button fill="outline" size="small" color="medium" (click)="kurangiItem(item.produk.id)" style="--padding-start: 6px; --padding-end: 6px;">
+              <ion-icon name="remove" slot="icon-only"></ion-icon>
+            </ion-button>
+            <span style="font-weight: 800; font-size: 15px; min-width: 20px; text-align: center;">{{ item.jumlah }}</span>
+            <ion-button fill="outline" size="small" color="primary" (click)="tambahItem(item.produk.id)" style="--padding-start: 6px; --padding-end: 6px;">
+              <ion-icon name="add" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+
+        </ion-item>
+
+        <!-- Swipe Option (Swipe-to-delete animation) -->
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="hapusItem(item.produk.id)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+    </ion-list>
+
+    <!-- Ringkasan Checkout Card -->
+    <ion-card style="margin: 20px 0 0 0; border-radius: 14px; border: 1px solid var(--ion-color-step-150, #eee); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+      <ion-card-header>
+        <ion-card-title style="font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+          <ion-icon name="receipt-outline" color="primary"></ion-icon>
+          Ringkasan Tagihan Kasir
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item lines="none" style="--padding-start: 0;">
+          <ion-label style="font-size: 13px;">Metode Pembayaran:</ion-label>
+          <ion-select [(ngModel)]="metodePembayaran" interface="popover" style="font-weight: 700;">
+            <ion-select-option value="Tunai">Tunai / Cash</ion-select-option>
+            <ion-select-option value="QRIS">QRIS / E-Wallet</ion-select-option>
+            <ion-select-option value="Transfer">Transfer Bank</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 13px; opacity: 0.8;">
+          <span>Proyeksi Untung Transaksi:</span>
+          <span style="font-weight: 700; color: var(--ion-color-success);">+ Rp {{ totalKeuntungan | number:'1.0-0' }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ion-color-step-150, #eee);">
+          <span style="font-size: 16px; font-weight: 700;">Total Belanja:</span>
+          <span style="font-size: 22px; font-weight: 800; color: var(--ion-color-primary);">
+            Rp {{ totalBelanja | number:'1.0-0' }}
+          </span>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Confirm Transaction Button -->
+    <ion-button 
+      expand="block" 
+      size="large" 
+      color="primary"
+      (click)="konfirmasiCheckout()"
+      style="--border-radius: 14px; font-weight: 800; margin-top: 20px; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);"
+    >
+      <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+      Konfirmasi Transaksi
+    </ion-button>
+
+  </div>
+
+</ion-content>

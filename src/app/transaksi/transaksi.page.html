@@ -1,13 +1,139 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>transaksi</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Riwayat Transaksi</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">transaksi</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <!-- Empty History State -->
+  <div *ngIf="listTransaksi.length === 0" style="text-align: center; padding: 60px 20px;">
+    <ion-icon name="receipt-outline" style="font-size: 72px; color: var(--ion-color-step-300, #ccc); margin-bottom: 16px;"></ion-icon>
+    <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Belum Ada Riwayat Transaksi</h2>
+    <p style="font-size: 14px; opacity: 0.7; margin: 8px 0 24px 0;">Transaksi yang di-checkout akan otomatis tercatat secara rapi di sini.</p>
+    <ion-button routerLink="/produk" fill="solid" color="primary" style="--border-radius: 12px;">
+      Mulai Transaksi Baru
+    </ion-button>
+  </div>
+
+  <div *ngIf="listTransaksi.length > 0">
+
+    <div style="margin-bottom: 12px; padding: 0 4px; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 13px; opacity: 0.7;">Total {{ listTransaksi.length }} Transaksi Tercatat</span>
+      <span style="font-size: 11px; opacity: 0.6; font-style: italic;">Klik transaksi untuk rincian struk</span>
+    </div>
+
+    <!-- Transaction List -->
+    <ion-list style="border-radius: 14px; overflow: hidden;">
+      <ion-card *ngFor="let item of listTransaksi" (click)="bukaDetail(item)" style="margin: 0 0 10px 0; border-radius: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <ion-card-header style="padding-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <ion-card-title style="font-size: 15px; font-weight: 700; color: var(--ion-color-primary);">
+              {{ item.id }}
+            </ion-card-title>
+            <ion-badge color="tertiary" style="font-size: 10px;">{{ item.metodePembayaran }}</ion-badge>
+          </div>
+          <ion-card-subtitle style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+            {{ item.tanggal | date:'dd MMM yyyy, HH:mm' }} &bull; {{ item.items.length }} Jenis Barang
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content style="padding-top: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--ion-color-step-150, #eee); padding-top: 8px;">
+            <div>
+              <span style="font-size: 11px; opacity: 0.6;">Total Belanja</span>
+              <div style="font-size: 16px; font-weight: 800; color: var(--ion-color-primary);">
+                Rp {{ item.totalHarga | number:'1.0-0' }}
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 11px; opacity: 0.6;">Untung Kasir</span>
+              <div style="font-size: 14px; font-weight: 700; color: var(--ion-color-success);">
+                + Rp {{ item.totalKeuntungan | number:'1.0-0' }}
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+
+  </div>
+
+  <!-- Detail Struk Modal (Modal Rincian Transaksi) -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="tutupDetail()">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="primary">
+          <ion-title>Struk Transaksi</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="tutupDetail()">Tutup</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="selectedTransaksi">
+
+        <!-- Receipt Header Card -->
+        <div style="text-align: center; border-bottom: 2px dashed var(--ion-color-step-200, #ccc); padding-bottom: 16px; margin-bottom: 16px;">
+          <ion-icon name="storefront-outline" color="primary" style="font-size: 48px;"></ion-icon>
+          <h2 style="margin: 4px 0 0; font-size: 20px; font-weight: 800; color: var(--ion-color-primary);">TOKO MAKMUR JAYA</h2>
+          <p style="margin: 2px 0; font-size: 12px; opacity: 0.7;">Sistem Kasir SIMOBILE Bu Marni</p>
+          <div style="font-size: 13px; font-weight: 700; margin-top: 8px; color: var(--ion-color-secondary-shade);">
+            {{ selectedTransaksi.id }}
+          </div>
+          <div style="font-size: 11px; opacity: 0.6;">
+            {{ selectedTransaksi.tanggal | date:'dd MMMM yyyy - HH:mm:ss' }}
+          </div>
+        </div>
+
+        <!-- Receipt Items Table -->
+        <h4 style="font-size: 14px; font-weight: 700; margin: 0 0 8px 0;">Rincian Barang Dibeli:</h4>
+
+        <div style="border-radius: 10px; border: 1px solid var(--ion-color-step-150, #eee); overflow: hidden; margin-bottom: 16px;">
+          <ion-grid class="ion-no-padding">
+            <ion-row style="background: var(--ion-color-step-100, #f0f0f0); padding: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+              <ion-col size="6">Item Produk</ion-col>
+              <ion-col size="2" style="text-align: center;">Qty</ion-col>
+              <ion-col size="4" style="text-align: right;">Subtotal</ion-col>
+            </ion-row>
+
+            <ion-row *ngFor="let it of selectedTransaksi.items" style="padding: 10px 8px; border-bottom: 1px solid var(--ion-color-step-150, #eee); font-size: 13px;">
+              <ion-col size="6">
+                <div style="font-weight: 600;">{{ it.namaProduk }}</div>
+                <div style="font-size: 10px; opacity: 0.6;">@ Rp {{ it.hargaJual | number:'1.0-0' }}</div>
+              </ion-col>
+              <ion-col size="2" style="text-align: center; font-weight: 700;">x{{ it.jumlah }}</ion-col>
+              <ion-col size="4" style="text-align: right; font-weight: 700;">Rp {{ it.subtotal | number:'1.0-0' }}</ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+
+        <!-- Receipt Calculation Summary -->
+        <div style="background: var(--ion-color-step-50, #fafafa); padding: 14px; border-radius: 12px; border: 1px solid var(--ion-color-step-150, #eee); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+            <span>Metode Pembayaran:</span>
+            <span style="font-weight: 700;">{{ selectedTransaksi.metodePembayaran }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+            <span>Proyeksi Untung Bersih:</span>
+            <span style="font-weight: 700; color: var(--ion-color-success);">+ Rp {{ selectedTransaksi.totalKeuntungan | number:'1.0-0' }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; border-top: 1px solid var(--ion-color-step-200, #ccc); padding-top: 8px; margin-top: 8px;">
+            <span>TOTAL BAYAR:</span>
+            <span style="color: var(--ion-color-primary);">Rp {{ selectedTransaksi.totalHarga | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <ion-button expand="block" color="primary" (click)="tutupDetail()" style="--border-radius: 12px;">
+          Selesai & Tutup Struk
+        </ion-button>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>
+

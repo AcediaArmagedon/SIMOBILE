@@ -1,13 +1,189 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dashboard</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard Kasir</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/keranjang">
+        <ion-icon name="cart-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <!-- Store Greeting Banner -->
+  <div class="welcome-banner" style="background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-tertiary) 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <p style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.85; letter-spacing: 0.5px;">Selamat Datang, Bu Marni</p>
+
+        <h2 style="margin: 4px 0 0; font-size: 22px; font-weight: 700;">Toko Makmur Jaya</h2>
+      </div>
+      <ion-icon name="storefront" style="font-size: 42px; opacity: 0.9;"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Ringkasan Stat Grid (Interpolation Binding) -->
+  <h3 class="section-title" style="font-size: 16px; font-weight: 700; margin: 0 0 12px 4px; display: flex; align-items: center; gap: 6px;">
+    <ion-icon name="stats-chart-outline" color="primary"></ion-icon>
+    <span>Ringkasan Hari Ini</span>
+  </h3>
+
+  <ion-grid class="ion-no-padding" style="margin-bottom: 20px;">
+    <ion-row>
+
+      <!-- Stat 1: Total Produk -->
+      <ion-col size="6" size-md="3" style="padding: 4px;">
+        <div class="stat-card" style="background: var(--ion-color-step-50, #f9f9f9); padding: 16px; border-radius: 14px; border: 1px solid var(--ion-color-step-150, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <ion-icon name="cube-outline" color="primary" style="font-size: 22px;"></ion-icon>
+            <span style="font-size: 12px; color: var(--ion-color-step-600, #666); font-weight: 500;">Total Produk</span>
+          </div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--ion-color-primary);">
+            {{ ringkasan?.totalProduk || 0 }}
+          </div>
+          <span style="font-size: 11px; opacity: 0.7;">Item terdaftar</span>
+        </div>
+      </ion-col>
+
+      <!-- Stat 2: Transaksi Hari Ini -->
+      <ion-col size="6" size-md="3" style="padding: 4px;">
+        <div class="stat-card" style="background: var(--ion-color-step-50, #f9f9f9); padding: 16px; border-radius: 14px; border: 1px solid var(--ion-color-step-150, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <ion-icon name="receipt-outline" color="secondary" style="font-size: 22px;"></ion-icon>
+            <span style="font-size: 12px; color: var(--ion-color-step-600, #666); font-weight: 500;">Transaksi</span>
+          </div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--ion-color-secondary);">
+            {{ ringkasan?.totalTransaksiHariIni || 0 }}
+          </div>
+          <span style="font-size: 11px; opacity: 0.7;">Nota hari ini</span>
+        </div>
+      </ion-col>
+
+      <!-- Stat 3: Total Omzet Penjualan -->
+      <ion-col size="6" size-md="3" style="padding: 4px;">
+        <div class="stat-card" style="background: var(--ion-color-step-50, #f9f9f9); padding: 16px; border-radius: 14px; border: 1px solid var(--ion-color-step-150, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <ion-icon name="cash-outline" color="success" style="font-size: 22px;"></ion-icon>
+            <span style="font-size: 12px; color: var(--ion-color-step-600, #666); font-weight: 500;">Omzet Hari Ini</span>
+          </div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--ion-color-success);">
+            Rp {{ ringkasan?.totalPenjualanHariIni | number:'1.0-0' }}
+          </div>
+          <span style="font-size: 11px; opacity: 0.7;">Total pendapatan</span>
+        </div>
+      </ion-col>
+
+      <!-- Stat 4: Total Profit -->
+      <ion-col size="6" size-md="3" style="padding: 4px;">
+        <div class="stat-card" style="background: var(--ion-color-step-50, #f9f9f9); padding: 16px; border-radius: 14px; border: 1px solid var(--ion-color-step-150, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <ion-icon name="trending-up-outline" color="tertiary" style="font-size: 22px;"></ion-icon>
+            <span style="font-size: 12px; color: var(--ion-color-step-600, #666); font-weight: 500;">Untung Bersih</span>
+          </div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--ion-color-tertiary);">
+            Rp {{ ringkasan?.totalKeuntunganHariIni | number:'1.0-0' }}
+          </div>
+          <span style="font-size: 11px; opacity: 0.7;">Profit hari ini</span>
+        </div>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <!-- Produk Terlaris Card (Interpolation Binding) -->
+  <ion-card style="margin: 0 0 20px 0; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+    <ion-card-header style="padding-bottom: 8px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <ion-card-title style="font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+          <ion-icon name="trophy-outline" color="warning"></ion-icon>
+          Produk Terlaris Hari Ini
+        </ion-card-title>
+        <ion-badge color="warning">Best Seller</ion-badge>
+      </div>
+    </ion-card-header>
+    <ion-card-content>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px;">
+        <div>
+          <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--ion-color-primary);">
+            {{ ringkasan?.produkTerlaris || '-' }}
+          </h4>
+          <p style="margin: 4px 0 0; font-size: 13px; opacity: 0.7;">Terjual terbanyak dalam transaksi hari ini</p>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 20px; font-weight: 800; color: var(--ion-color-warning-shade, #d48800);">
+            {{ ringkasan?.jumlahTerlaris || 0 }}
+          </div>
+          <span style="font-size: 11px; opacity: 0.7;">unit terjual</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Quick Actions Header -->
+  <h3 class="section-title" style="font-size: 16px; font-weight: 700; margin: 0 0 12px 4px; display: flex; align-items: center; gap: 6px;">
+    <ion-icon name="flash-outline" color="primary"></ion-icon>
+    <span>Aksi Cepat</span>
+  </h3>
+
+  <ion-grid class="ion-no-padding" style="margin-bottom: 20px;">
+    <ion-row>
+
+      <ion-col size="4" style="padding: 4px;">
+        <ion-button expand="block" fill="outline" routerLink="/produk-form" style="--border-radius: 12px; height: 75px;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0;">
+            <ion-icon name="add-circle-outline" style="font-size: 24px;"></ion-icon>
+            <span style="font-size: 11px;">Tambah Produk</span>
+          </div>
+        </ion-button>
+      </ion-col>
+
+      <ion-col size="4" style="padding: 4px;">
+        <ion-button expand="block" fill="solid" color="primary" routerLink="/produk" style="--border-radius: 12px; height: 75px;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0;">
+            <ion-icon name="storefront-outline" style="font-size: 24px;"></ion-icon>
+            <span style="font-size: 11px;">Katalog Kasir</span>
+          </div>
+        </ion-button>
+      </ion-col>
+
+      <ion-col size="4" style="padding: 4px;">
+        <ion-button expand="block" fill="outline" color="tertiary" routerLink="/transaksi" style="--border-radius: 12px; height: 75px;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0;">
+            <ion-icon name="time-outline" style="font-size: 24px;"></ion-icon>
+            <span style="font-size: 11px;">Riwayat Struk</span>
+          </div>
+        </ion-button>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <!-- Peringatan Stok Menipis -->
+  <div *ngIf="produkStokHampirHabis.length > 0" style="margin-top: 10px;">
+    <h3 class="section-title" style="font-size: 16px; font-weight: 700; margin: 0 0 12px 4px; display: flex; align-items: center; gap: 6px; color: var(--ion-color-danger);">
+      <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+      <span>Peringatan Stok Menipis (&le; 5 unit)</span>
+    </h3>
+
+    <ion-list style="border-radius: 14px; overflow: hidden;">
+      <ion-item *ngFor="let item of produkStokHampirHabis" [routerLink]="['/produk-detail', item.id]" button>
+        <ion-avatar slot="start" style="width: 40px; height: 40px;">
+          <img [src]="item.foto || 'https://placehold.co/400x400/2e7d32/ffffff?text=No+Photo'" [alt]="item.nama" />
+        </ion-avatar>
+        <ion-label>
+          <h2 style="font-size: 14px; font-weight: 600;">{{ item.nama }}</h2>
+          <p style="font-size: 12px;">Rp {{ item.hargaJual | number:'1.0-0' }} &bull; {{ item.kategori }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="item.stok === 0 ? 'danger' : 'warning'">
+          {{ item.stok === 0 ? 'Habis' : 'Sisa ' + item.stok }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+  </div>
+
 </ion-content>
+

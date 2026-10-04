@@ -1,0 +1,139 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/produk"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Edit Produk' : 'Tambah Produk Baru' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form [formGroup]="produkForm" (ngSubmit)="simpanProduk()">
+
+    <ion-card style="margin: 0 0 20px 0; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+      <ion-card-header>
+        <ion-card-title style="font-size: 16px; font-weight: 700;">
+          Informasi Dasar Produk
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <!-- Nama Produk -->
+        <ion-item lines="full">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">Nama Produk *</ion-label>
+          <ion-input 
+            formControlName="nama" 
+            placeholder="Contoh: Beras Pandan Wangi 5kg"
+            type="text"
+          ></ion-input>
+        </ion-item>
+        <div *ngIf="f['nama'].invalid && (f['nama'].dirty || f['nama'].touched)" style="padding: 4px 16px; color: var(--ion-color-danger); font-size: 12px; font-weight: 500;">
+          <span *ngIf="f['nama'].errors?.['required']">&bull; Nama produk wajib diisi!</span>
+          <span *ngIf="f['nama'].errors?.['minlength']">&bull; Nama produk minimal 3 karakter!</span>
+        </div>
+
+        <!-- Kategori Produk -->
+        <ion-item lines="full" style="margin-top: 12px;">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">Kategori *</ion-label>
+          <ion-select formControlName="kategori" placeholder="Pilih Kategori">
+            <ion-select-option *ngFor="let kat of kategoriList" [value]="kat">{{ kat }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Foto URL (Opsional) -->
+        <ion-item lines="full" style="margin-top: 12px;">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">URL Foto Produk (Opsional)</ion-label>
+          <ion-input 
+            formControlName="foto" 
+            placeholder="Kosongkan jika belum ada foto (menampilkan foto default)"
+            type="url"
+          ></ion-input>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card style="margin: 0 0 20px 0; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+      <ion-card-header>
+        <ion-card-title style="font-size: 16px; font-weight: 700;">
+          Harga & Stok Warung
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <!-- Harga Beli -->
+        <ion-item lines="full">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">Harga Beli / Modal (Rp) *</ion-label>
+          <ion-input 
+            formControlName="hargaBeli" 
+            placeholder="Contoh: 15000"
+            type="number"
+            min="1"
+          ></ion-input>
+        </ion-item>
+        <div *ngIf="f['hargaBeli'].invalid && (f['hargaBeli'].dirty || f['hargaBeli'].touched)" style="padding: 4px 16px; color: var(--ion-color-danger); font-size: 12px; font-weight: 500;">
+          <span *ngIf="f['hargaBeli'].errors?.['required']">&bull; Harga beli wajib diisi!</span>
+          <span *ngIf="f['hargaBeli'].errors?.['min']">&bull; Harga beli harus berupa angka lebih dari 0!</span>
+        </div>
+
+        <!-- Harga Jual -->
+        <ion-item lines="full" style="margin-top: 12px;">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">Harga Jual / Kasir (Rp) *</ion-label>
+          <ion-input 
+            formControlName="hargaJual" 
+            placeholder="Contoh: 18000"
+            type="number"
+            min="1"
+          ></ion-input>
+        </ion-item>
+        <div *ngIf="f['hargaJual'].invalid && (f['hargaJual'].dirty || f['hargaJual'].touched)" style="padding: 4px 16px; color: var(--ion-color-danger); font-size: 12px; font-weight: 500;">
+          <span *ngIf="f['hargaJual'].errors?.['required']">&bull; Harga jual wajib diisi!</span>
+          <span *ngIf="f['hargaJual'].errors?.['min']">&bull; Harga jual harus berupa angka lebih dari 0!</span>
+        </div>
+
+        <!-- Stok Barang -->
+        <ion-item lines="full" style="margin-top: 12px;">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">Stok Barang Tersedia *</ion-label>
+          <ion-input 
+            formControlName="stok" 
+            placeholder="Contoh: 10"
+            type="number"
+            min="0"
+          ></ion-input>
+        </ion-item>
+        <div *ngIf="f['stok'].invalid && (f['stok'].dirty || f['stok'].touched)" style="padding: 4px 16px; color: var(--ion-color-danger); font-size: 12px; font-weight: 500;">
+          <span *ngIf="f['stok'].errors?.['required']">&bull; Stok wajib diisi!</span>
+          <span *ngIf="f['stok'].errors?.['min']">&bull; Stok tidak boleh negatif!</span>
+        </div>
+
+        <!-- Deskripsi Barang -->
+        <ion-item lines="full" style="margin-top: 12px;">
+          <ion-label position="stacked" style="font-weight: 600; font-size: 14px;">Deskripsi Singkat (Opsional)</ion-label>
+          <ion-textarea 
+            formControlName="deskripsi" 
+            placeholder="Keterangan tambahan barang..."
+            rows="3"
+          ></ion-textarea>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Form Submit Button -->
+    <ion-button 
+      type="submit" 
+      expand="block" 
+      size="large" 
+      color="primary"
+      style="--border-radius: 14px; font-weight: 700; margin-top: 24px;"
+    >
+      <ion-icon [name]="isEditMode ? 'checkmark-circle-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+      {{ isEditMode ? 'Simpan Perubahan' : 'Tambah Produk Sekarang' }}
+    </ion-button>
+
+  </form>
+
+</ion-content>

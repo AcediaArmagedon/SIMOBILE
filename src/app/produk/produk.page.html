@@ -1,13 +1,132 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>produk</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Katalog Produk</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/produk-form">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <!-- Real-Time Search Bar (Two-way Binding dengan [(ngModel)]) -->
+  <ion-toolbar color="primary">
+    <ion-searchbar 
+      [(ngModel)]="searchQuery" 
+      (ionInput)="onSearchChange()" 
+      placeholder="Cari nama, kategori, deskripsi..."
+      animated="true"
+      show-clear-button="always"
+      style="--background: rgba(255,255,255,0.15); --color: white; --placeholder-color: rgba(255,255,255,0.7); --icon-color: white; --clear-button-color: white;"
+    ></ion-searchbar>
+  </ion-toolbar>
+
+  <!-- Kategori Chips Filter -->
+  <div style="background: var(--ion-color-primary); padding: 0 12px 12px 12px; overflow-x: auto; white-space: nowrap; display: flex; gap: 8px;">
+    <ion-chip 
+      *ngFor="let kat of kategoriList" 
+      [color]="selectedKategori === kat ? 'warning' : 'light'"
+      (click)="onKategoriChange(kat)"
+      style="margin: 0; font-weight: 600;"
+    >
+      <ion-label>{{ kat }}</ion-label>
+    </ion-chip>
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">produk</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <!-- Info Hasil Pencarian -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+    <span style="font-size: 13px; opacity: 0.7;">
+      Menampilkan {{ listProduk.length }} barang
+    </span>
+    <span style="font-size: 11px; opacity: 0.6; font-style: italic;">
+      Geser item ke kiri untuk opsi
+    </span>
+  </div>
+
+  <!-- Empty State Jika Tidak Ada Produk -->
+  <div *ngIf="listProduk.length === 0" style="text-align: center; padding: 40px 20px;">
+    <ion-icon name="search-outline" style="font-size: 64px; color: var(--ion-color-step-300, #ccc); margin-bottom: 12px;"></ion-icon>
+    <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Produk Tidak Ditemukan</h3>
+    <p style="font-size: 13px; opacity: 0.7; margin-top: 4px;">Coba gunakan kata kunci pencarian atau kategori lain.</p>
+  </div>
+
+  <!-- List Produk dengan ion-item-sliding (Animasi Swipe) -->
+  <ion-list *ngIf="listProduk.length > 0" style="border-radius: 14px; overflow: hidden; background: transparent;">
+
+    <ion-item-sliding *ngFor="let item of listProduk" style="margin-bottom: 8px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+
+      <ion-item button (click)="bukaDetail(item.id)" lines="none" style="--padding-start: 12px; --inner-padding-end: 12px;">
+
+        <!-- Property Binding untuk Fallback Gambar Default jika foto kosong -->
+        <ion-thumbnail slot="start" style="width: 56px; height: 56px; border-radius: 10px; overflow: hidden;">
+          <img 
+            [src]="item.foto || defaultImage" 
+            [alt]="item.nama"
+            style="object-fit: cover; width: 100%; height: 100%;" 
+          />
+        </ion-thumbnail>
+
+        <ion-label style="margin-left: 4px;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+            <ion-badge color="tertiary" style="font-size: 10px; font-weight: 500;">{{ item.kategori }}</ion-badge>
+            <ion-badge [color]="item.stok === 0 ? 'danger' : (item.stok <= 5 ? 'warning' : 'success')" style="font-size: 10px;">
+              {{ item.stok === 0 ? 'Stok Habis' : 'Stok: ' + item.stok }}
+            </ion-badge>
+          </div>
+
+          <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 4px 0;">{{ item.nama }}</h2>
+          
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 14px; font-weight: 800; color: var(--ion-color-primary);">
+              Rp {{ item.hargaJual | number:'1.0-0' }}
+            </span>
+            <span style="font-size: 11px; opacity: 0.6;">
+              Untung: Rp {{ (item.hargaJual - item.hargaBeli) | number:'1.0-0' }}
+            </span>
+          </div>
+        </ion-label>
+
+        <!-- Property Binding: [disabled]="item.stok === 0" -->
+        <!-- Event Binding: (click)="tambahKeKeranjang(item, $event)" -->
+        <ion-button 
+          slot="end" 
+          fill="solid" 
+          color="primary" 
+          size="small" 
+          [disabled]="item.stok === 0"
+          (click)="tambahKeKeranjang(item, $event)"
+          style="--border-radius: 8px; margin: 0;"
+        >
+          <ion-icon name="cart-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+
+      </ion-item>
+
+      <!-- Options (Animasi Swipe Item Sliding) -->
+      <ion-item-options side="end">
+        <ion-item-option color="warning" (click)="editProduk(item.id, $event)">
+          <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="hapusProduk(item.id, $event)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+  <!-- FAB Tambah Produk Baru -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="secondary" routerLink="/produk-form">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>
+
