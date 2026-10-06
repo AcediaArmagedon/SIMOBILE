@@ -10,37 +10,12 @@ Repository GitHub Target: [https://github.com/AcediaArmagedon/SIMOBILE](https://
 
 ---
 
-## 🚀 Cara Instalasi & Menjalankan Aplikasi
 
-### Prasyarat System
-- **Node.js**: `v18.x` atau versi yang lebih baru
-- **npm**: `v9.x` atau lebih baru
-- **Ionic CLI** (opsional): `npm install -g @ionic/cli`
-
-### Langkah Pengerjaan / Run Locally
-1. **Clone Repository**:
-   ```bash
-   git clone https://github.com/AcediaArmagedon/SIMOBILE.git
-   cd SIMOBILE
-   ```
-2. **Install Dependensi**:
-   ```bash
-   npm install
-   ```
-3. **Jalankan Development Server**:
-   ```bash
-   npm start
-   # atau
-   ng serve
-   # atau
-   ionic serve
-   ```
-4. **Buka Browser**:
-   Akses `http://localhost:4200` pada peramban web Anda. Disarankan menggunakan tampilan **Mobile View / Device Emulation** (F12 di Chrome / Firefox).
+   Akses `http://localhost:4200`
 
 ---
 
-## ✨ Fitur-Fitur & Ketentuan Teknis yang Diimplementasikan
+## Fitur-Fitur & Ketentuan Teknis yang Diimplementasikan
 
 Aplikasi ini mengimplementasikan 100% seluruh poin teknis yang dipersyaratkan pada **Soal UTS Pemrograman Mobile**:
 
@@ -99,7 +74,7 @@ Proyek ini memisahkan logika bisnis secara penuh ke dalam **4 Angular Services**
 
 ---
 
-## 📊 Minimal 10 Data Dummy Produk Teruji
+## Minimal 10 Data Dummy Produk Teruji
 
 Aplikasi dilengkapi dengan 12 data dummy awal yang mencakup variasi harga, kategori, serta status stok (termasuk stok 0 dan foto kosong untuk pengujian):
 1. **Beras Pandan Wangi 5kg** (Sembako - Stok: 15)
