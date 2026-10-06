@@ -1,0 +1,44 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/produk"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detail produk</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">produk-detail</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card *ngIf="product">
+
+    <ion-card-header>
+      <ion-card-title>{{ product.name }}</ion-card-title>
+      <ion-card-subtitle>{{ product.category }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <p>
+        <strong>Stok:</strong>
+        {{ product.stock }}
+      </p>
+
+      <p>
+        <strong>Harga Beli:</strong>
+        Rp {{ product.purchasePrice }}
+      </p>
+
+      <p>
+        <strong>Harga Jual:</strong>
+        Rp {{ product.sellingPrice }}
+      </p>
+
+    </ion-card-content>
+
+  </ion-card>
+</ion-content>

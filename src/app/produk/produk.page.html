@@ -22,7 +22,7 @@
   </ion-item>
   
   <ion-list>
-    <ion-item *ngFor="let product of products">
+    <ion-item *ngFor="let product of products" [routerLink]="['/produk', product.id]">
       <ion-label>
         <h2>{{ product.name }}</h2>
         <p>{{ product.category }}</p>
